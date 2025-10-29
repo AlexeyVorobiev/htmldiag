@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Compact Audio Player</title>
+  <style>
+    :root{
+      color-scheme: light;
+      --bg:#eef2f6;
+      --card:#f9fbff;
+      --accent:#0a9a9f;
+      --accent-strong:#087c81;
+      --text:#1b2a3a;
+      --muted:#5f6f81;
+      --border:#d6dde7;
+      --slider-track:#cfd8e6;
+    }
+    *{box-sizing:border-box;font-family:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
+    html,body{width:400px;height:96px;margin:0;background:var(--bg);display:flex;align-items:center;justify-content:center;overflow:hidden}
+    body{padding:0}
+    .player{width:360px;display:flex;align-items:center;gap:18px;background:var(--card);border-radius:18px;padding:18px 20px;box-shadow:0 12px 26px rgba(16,53,71,.12);border:1px solid rgba(255,255,255,.65)}
+    .icon-btn{width:44px;height:44px;border-radius:50%;border:none;display:inline-flex;align-items:center;justify-content:center;background:var(--accent);color:#fff;cursor:pointer;transition:transform .2s ease,box-shadow .2s ease,background .2s ease}
+    .icon-btn svg{width:16px;height:16px;fill:currentColor}
+    .icon-btn:focus{outline:none;box-shadow:0 0 0 4px rgba(10,154,159,.22)}
+    .icon-btn:hover{transform:translateY(-1px);box-shadow:0 8px 16px rgba(8,124,129,.22);background:var(--accent-strong)}
+    .icon-btn[disabled]{opacity:.55;cursor:not-allowed;transform:none;box-shadow:none;background:var(--accent-strong)}
+    .seek-wrap{flex:1;display:flex;align-items:center;gap:12px}
+    .seek-wrap label{display:none}
+    .time{font-variant-numeric:tabular-nums;font-size:13px;font-weight:600;color:var(--muted);min-width:46px;text-align:right}
+    input[type="range"]{flex:1;appearance:none;height:8px;border-radius:999px;background:linear-gradient(to right,var(--accent) 0%,var(--accent) calc(var(--fill,0)*100%),var(--slider-track) calc(var(--fill,0)*100%),var(--slider-track) 100%);position:relative;transition:background .2s ease}
+    input[type="range"]::-webkit-slider-runnable-track{height:8px;border-radius:999px;background:transparent}
+    input[type="range"]::-moz-range-track{height:8px;border-radius:999px;background:transparent}
+    input[type="range"]::-webkit-slider-thumb{appearance:none;width:18px;height:18px;border-radius:50%;background:#fff;border:3px solid var(--accent);box-shadow:0 2px 6px rgba(8,124,129,.25);transition:transform .2s ease,box-shadow .2s ease}
+    input[type="range"]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:#fff;border:3px solid var(--accent);box-shadow:0 2px 6px rgba(8,124,129,.25);transition:transform .2s ease,box-shadow .2s ease}
+    input[type="range"]:hover::-webkit-slider-thumb,input[type="range"]:focus::-webkit-slider-thumb{transform:scale(1.05);box-shadow:0 4px 10px rgba(8,124,129,.3)}
+    input[type="range"]:hover::-moz-range-thumb,input[type="range"]:focus::-moz-range-thumb{transform:scale(1.05);box-shadow:0 4px 10px rgba(8,124,129,.3)}
+  </style>
+</head>
+<body>
+<div class="player">
+  <button type="button" class="icon-btn" id="playBtn" aria-label="Play">
+    <svg viewBox="0 0 12 12" aria-hidden="true"><path d="M3 2.25v7.5L9.5 6 3 2.25z"></path></svg>
+  </button>
+  <button type="button" class="icon-btn" id="pauseBtn" aria-label="Pause" disabled>
+    <svg viewBox="0 0 12 12" aria-hidden="true"><path d="M3 2.2h2.2v7.6H3V2.2zm3.8 0H9v7.6H6.8V2.2z"></path></svg>
+  </button>
+  <div class="seek-wrap">
+    <input id="seek" type="range" value="0" min="0" max="1" step="0.01" aria-label="Seek">
+    <span class="time" id="time">0:00</span>
+  </div>
+</div>
+<audio id="audio" src="track.mp3" preload="metadata"></audio>
+<script>
+(()=>{"use strict";
+  const audio=document.getElementById("audio");
+  const playBtn=document.getElementById("playBtn");
+  const pauseBtn=document.getElementById("pauseBtn");
+  const seek=document.getElementById("seek");
+  const time=document.getElementById("time");
+  let seeking=false;
+
+  const formatTime=seconds=>{
+    if(!Number.isFinite(seconds)) return "0:00";
+    const mins=Math.floor(seconds/60);
+    const secs=Math.max(0,Math.floor(seconds%60));
+    return `${mins}:${secs.toString().padStart(2,"0")}`;
+  };
+
+  const updateSeekFill=()=>{
+    const max=parseFloat(seek.max||"1");
+    const value=parseFloat(seek.value||"0");
+    const fraction=max>0?value/max:0;
+    seek.style.setProperty("--fill",fraction);
+  };
+
+  const syncTime=()=>{
+    const remaining=audio.duration - audio.currentTime;
+    if(Number.isFinite(remaining)){
+      time.textContent=formatTime(remaining);
+    }else{
+      time.textContent="0:00";
+    }
+  };
+
+  function enableControls(){
+    const ready=Number.isFinite(audio.duration)&&audio.duration>0;
+    playBtn.disabled=false;
+    pauseBtn.disabled=audio.paused;
+    if(ready){
+      seek.max=audio.duration;
+      seek.step="0.01";
+      updateSeekFill();
+      syncTime();
+    }
+  }
+
+  audio.addEventListener("loadedmetadata",()=>{
+    seek.max=audio.duration;
+    enableControls();
+  });
+
+  audio.addEventListener("play",()=>{
+    playBtn.disabled=true;
+    pauseBtn.disabled=false;
+  });
+
+  audio.addEventListener("pause",()=>{
+    pauseBtn.disabled=true;
+    playBtn.disabled=false;
+  });
+
+  audio.addEventListener("timeupdate",()=>{
+    if(!seeking){
+      seek.value=audio.currentTime;
+      updateSeekFill();
+    }
+    syncTime();
+  });
+
+  audio.addEventListener("ended",()=>{
+    audio.currentTime=0;
+    playBtn.disabled=false;
+    pauseBtn.disabled=true;
+    seek.value=0;
+    updateSeekFill();
+    syncTime();
+  });
+
+  playBtn.addEventListener("click",()=>{
+    audio.play().catch(()=>{});
+  });
+
+  pauseBtn.addEventListener("click",()=>{
+    audio.pause();
+  });
+
+  seek.addEventListener("input",()=>{
+    seeking=true;
+    audio.currentTime=parseFloat(seek.value||"0");
+    updateSeekFill();
+    syncTime();
+  });
+
+  seek.addEventListener("change",()=>{
+    seeking=false;
+    audio.currentTime=parseFloat(seek.value||"0");
+    updateSeekFill();
+    syncTime();
+  });
+
+  enableControls();
+})();
+</script>
+</body>
+</html>
