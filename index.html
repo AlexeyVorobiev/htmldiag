@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Persona Ratings Diagram</title>
+  <style>
+    :root{
+      --bg:linear-gradient(135deg,#eef2ff 0%,#f8fbff 45%,#eef7ff 100%);
+      --card-bg:#fff;
+      --text-primary:#1a2240;
+      --text-muted:#5b6788;
+      --border:#d8def0;
+      --track:#e5eaf6;
+      --track-highlight:#d7e1ff;
+      --accent:#3454d1;
+      --accent-strong:#244e9b;
+      --shadow:0 14px 28px rgba(51,80,142,.15);
+      --radius-lg:20px;
+      --radius-sm:999px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0;background:var(--bg);height:100%;max-width:460px;max-height:800px;width:100%;display:flex;align-items:center;justify-content:center;padding:16px 12px;font-family:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:var(--text-primary);overflow:hidden;margin-left:auto;margin-right:auto}
+    #_app{width:100%;max-width:100%;background:var(--card-bg);padding:18px 24px;border-radius:var(--radius-lg);box-shadow:var(--shadow);border:1px solid rgba(255,255,255,.7);display:flex;flex-direction:column;gap:16px;height:100%;max-height:100%;min-height:0;overflow:hidden}
+    ._legend{display:flex;align-items:center;gap:12px;margin:0;flex-shrink:0;background:linear-gradient(135deg,#f1f4ff,#fbfdff);border:1px solid var(--border);padding:10px 14px;border-radius:16px;color:var(--text-muted);box-shadow:0 4px 10px rgba(31,62,125,.08)}
+    ._legend ._poor, ._legend ._excel{font-weight:700}
+    ._legend ._poor{color:#d6455d}
+    ._legend ._excel{margin-left:auto;font-weight:700;color:#228f76}
+    ._legend svg{flex:1;min-width:140px;height:12px}
+
+    ._bars{display:flex;flex-direction:column;gap:12px;overflow:auto;padding-right:6px;margin-right:-6px;flex:1;min-height:0}
+    ._row{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,2.5fr) minmax(96px,1fr);gap:14px;align-items:center;padding:12px 14px;border-radius:16px;transition:transform .2s ease,box-shadow .2s ease;background:#f9faff;border:1px solid transparent}
+    ._row:hover{transform:translateY(-1px);box-shadow:0 8px 14px rgba(41,72,139,.12);border-color:var(--track-highlight)}
+    ._avgRow{background:linear-gradient(135deg,#ecf3ff 0%,#f5faff 100%);border:1px solid var(--track-highlight)}
+    ._lab{font-weight:700;font-size:15px}
+    ._trk{height:12px;background:var(--track);border-radius:var(--radius-sm);position:relative;overflow:visible;border:1px solid var(--border)}
+    ._fill{position:absolute;inset:0 auto 0 0;height:100%;border-radius:var(--radius-sm);width:0%;background:linear-gradient(90deg,var(--accent) 0%,var(--accent-strong) 90%);transition:width .25s cubic-bezier(.33,.02,.31,1)}
+    ._val{justify-self:end;background:#fff;border:1px solid var(--border);color:var(--accent-strong);padding:6px 12px;border-radius:999px;text-align:center;font-weight:800;min-width:96px;box-shadow:0 4px 12px rgba(45,61,120,.08);transition:background .3s ease,color .3s ease,border-color .3s ease}
+    ._val[data-state="poor"]{color:#d6455d;border-color:rgba(214,69,93,.25);background:rgba(214,69,93,.08)}
+    ._val[data-state="fair"]{color:#c28533;border-color:rgba(194,133,51,.25);background:rgba(194,133,51,.1)}
+    ._val[data-state="good"]{color:#228f76;border-color:rgba(34,143,118,.26);background:rgba(34,143,118,.12)}
+    ._val[data-state="numeric"]{color:var(--accent-strong)}
+
+    ._avgRow ._val{font-weight:900;background:var(--accent-strong);color:#fff;border:none;box-shadow:0 10px 20px rgba(36,78,155,.22)}
+    ._avgRow ._trk{background:#dfe6fb}
+
+    ._rng{position:absolute;inset:-9px 0 -9px 0;width:100%;height:32px;background:transparent;cursor:pointer;appearance:none;-webkit-appearance:none;z-index:5}
+    ._rng:focus{outline:none}
+    ._rng::-webkit-slider-runnable-track{background:transparent}
+    ._rng::-moz-range-track{background:transparent}
+    ._rng::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:#fff;border:3px solid var(--accent-strong);box-shadow:0 0 0 3px rgba(36,78,155,.18);position:relative;z-index:6;transition:transform .2s ease,box-shadow .2s ease}
+    ._rng::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:#fff;border:3px solid var(--accent-strong);box-shadow:0 0 0 3px rgba(36,78,155,.18);position:relative;z-index:6;transition:transform .2s ease,box-shadow .2s ease}
+    ._rng:focus::-webkit-slider-thumb,._rng:hover::-webkit-slider-thumb{transform:scale(1.15);box-shadow:0 0 0 5px rgba(52,84,209,.25)}
+    ._rng:focus::-moz-range-thumb,._rng:hover::-moz-range-thumb{transform:scale(1.15);box-shadow:0 0 0 5px rgba(52,84,209,.25)}
+
+    @media (max-width:460px){
+      body{padding:12px 10px}
+      #_app{padding:18px 18px;gap:12px}
+      ._legend{margin-bottom:12px}
+      ._bars{padding-right:0;margin-right:0}
+      ._row{grid-template-columns:minmax(0,1fr) minmax(0,2fr);grid-template-areas:"label value" "track track";gap:10px;padding:10px 12px}
+      ._row ._lab{grid-area:label}
+      ._row ._val{grid-area:value;justify-self:end}
+      ._row ._trk{grid-area:track}
+    }
+  </style>
+</head>
+<body>
+<div class="_w" id="_app">
+  <div class="_legend">
+    <span class="_poor">Poor</span>
+    <svg viewBox="0 0 100 10" aria-hidden="true">
+      <line x1="0" y1="5" x2="96" y2="5" stroke="#888" stroke-width="2"></line>
+      <polygon points="96,1 100,5 96,9" fill="#888"></polygon>
+    </svg>
+    <span class="_excel">Excellent</span>
+  </div>
+
+  <div class="_bars" id="_bars">
+    <div class="_row" data-kind="cat" data-score="Good">
+      <div class="_lab">Time</div>
+      <div class="_trk"><div class="_fill"></div><input class="_rng" type="range" min="0" max="100" step="1"></div>
+      <div class="_val">Good</div>
+    </div>
+
+    <div class="_row" data-kind="cat" data-score="Good">
+      <div class="_lab">Listening</div>
+      <div class="_trk"><div class="_fill"></div><input class="_rng" type="range" min="0" max="100" step="1"></div>
+      <div class="_val">Good</div>
+    </div>
+
+    <div class="_row" data-kind="cat" data-score="Fair">
+      <div class="_lab">Explaining</div>
+      <div class="_trk"><div class="_fill"></div><input class="_rng" type="range" min="0" max="100" step="1"></div>
+      <div class="_val">Fair</div>
+    </div>
+
+    <div class="_row" data-kind="cat" data-score="Fair">
+      <div class="_lab">Involving</div>
+      <div class="_trk"><div class="_fill"></div><input class="_rng" type="range" min="0" max="100" step="1"></div>
+      <div class="_val">Fair</div>
+    </div>
+
+    <div class="_row" data-kind="cat" data-score="Poor">
+      <div class="_lab">Knowledge of Medical History</div>
+      <div class="_trk"><div class="_fill"></div><input class="_rng" type="range" min="0" max="100" step="1"></div>
+      <div class="_val">Poor</div>
+    </div>
+
+    <div class="_row" data-kind="cat" data-score="Fair">
+      <div class="_lab">Respect</div>
+      <div class="_trk"><div class="_fill"></div><input class="_rng" type="range" min="0" max="100" step="1"></div>
+      <div class="_val">Fair</div>
+    </div>
+
+    <div class="_row" data-kind="cat" data-score="Good">
+      <div class="_lab">Overall Care</div>
+      <div class="_trk"><div class="_fill"></div><input class="_rng" type="range" min="0" max="100" step="1"></div>
+      <div class="_val">Good</div>
+    </div>
+
+    <div class="_row" data-kind="num" data-score="5">
+      <div class="_lab">Doctor rating (0–10)</div>
+      <div class="_trk"><div class="_fill"></div><input class="_rng" type="range" min="0" max="100" step="1"></div>
+      <div class="_val">5</div>
+    </div>
+
+    <div class="_row" data-kind="cat" data-score="Poor">
+      <div class="_lab">Availability</div>
+      <div class="_trk"><div class="_fill"></div><input class="_rng" type="range" min="0" max="100" step="1"></div>
+      <div class="_val">Poor</div>
+    </div>
+
+    <div class="_row _avgRow" data-kind="avg">
+      <div class="_lab">Average</div>
+      <div class="_trk"><div class="_fill" id="_avgFill"></div></div>
+      <div class="_val" id="_avgVal">—</div>
+    </div>
+  </div>
+</div>
+
+<script>
+(()=>{"use strict";
+const CAT2PCT={good:67,fair:50,poor:33},
+  rows=[...document.querySelectorAll("._row")].filter(r=>r.dataset.kind!=="avg"),
+  avgFill=document.getElementById("_avgFill"),
+  avgVal=document.getElementById("_avgVal");
+
+const clamp=(n,min,max)=>Math.min(max,Math.max(min,n));
+
+function pctFromSeed(row){
+  const kind=row.dataset.kind, s=(row.dataset.score||"").toLowerCase().trim();
+  if(kind==="cat") return CAT2PCT[s]??50;
+  if(kind==="num"){ const n=parseFloat(s); return isNaN(n)?0:clamp(n,0,10)*10; }
+  return 0;
+}
+function labelFromPct(row,p){
+  if(row.dataset.kind==="num") return String(Math.round(p)/10);
+  if(p<=41) return "Poor";
+  if(p<=58) return "Fair";
+  return "Good";
+}
+function setValState(row,label){
+  const val=row.querySelector("._val");
+  const state=row.dataset.kind==="num"?"numeric":label.toLowerCase();
+  val.dataset.state=state;
+  val.textContent=label;
+}
+function setRow(row,p){
+  row.querySelector("._fill").style.width=p+"%";
+  setValState(row,labelFromPct(row,p));
+  row.querySelector("._rng").value=p;
+}
+function avg(){
+  const vals=rows.map(r=>parseFloat(r.querySelector("._rng").value||"0"));
+  const pct=vals.reduce((a,b)=>a+b,0)/vals.length||0;
+  avgFill.style.width=pct+"%";
+  const scaled=(pct/100*3).toFixed(2);
+  avgVal.textContent=`${scaled} (${Math.round(pct)}%)`;
+}
+
+rows.forEach(r=>{
+  const p=pctFromSeed(r);
+  setRow(r,p);
+  r.querySelector("._rng").addEventListener("input",e=>{
+    const v=parseFloat(e.target.value);
+    r.querySelector("._fill").style.width=v+"%";
+    setValState(r,labelFromPct(r,v));
+    avg();
+  },{passive:true});
+});
+avg();
+})();
+</script>
+</body>
+</html>
