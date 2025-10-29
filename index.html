@@ -15,51 +15,52 @@
       --track-highlight:#d7e1ff;
       --accent:#3454d1;
       --accent-strong:#244e9b;
-      --shadow:0 14px 28px rgba(51,80,142,.15);
-      --radius-lg:20px;
+      --shadow:0 10px 20px rgba(51,80,142,.12);
+      --radius-lg:18px;
       --radius-sm:999px;
+      --fs-base:13px;
+      --fs-small:11px;
     }
     *{box-sizing:border-box}
-    html,body{height:100%}
-    body{margin:0;background:var(--bg);height:100%;max-width:460px;max-height:800px;width:100%;display:flex;align-items:center;justify-content:center;padding:16px 12px;font-family:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:var(--text-primary);overflow:hidden;margin-left:auto;margin-right:auto}
-    #_app{width:100%;max-width:100%;background:var(--card-bg);padding:18px 24px;border-radius:var(--radius-lg);box-shadow:var(--shadow);border:1px solid rgba(255,255,255,.7);display:flex;flex-direction:column;gap:16px;height:100%;max-height:100%;min-height:0;overflow:hidden}
-    ._legend{display:flex;align-items:center;gap:12px;margin:0;flex-shrink:0;background:linear-gradient(135deg,#f1f4ff,#fbfdff);border:1px solid var(--border);padding:10px 14px;border-radius:16px;color:var(--text-muted);box-shadow:0 4px 10px rgba(31,62,125,.08)}
+    html,body{height:100%;width:100%}
+    body{margin:0;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:8px 0;font-family:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:var(--text-primary);overflow:hidden;font-size:var(--fs-base);line-height:1.35}
+    #_app{width:100%;max-width:400px;background:var(--card-bg);padding:14px 16px;border-radius:var(--radius-lg);box-shadow:var(--shadow);border:1px solid rgba(255,255,255,.7);display:flex;flex-direction:column;gap:10px;height:100%;max-height:700px;min-height:0;overflow:hidden}
+    ._legend{display:flex;align-items:center;gap:8px;margin:0;flex-shrink:0;background:linear-gradient(135deg,#f1f4ff,#fbfdff);border:1px solid var(--border);padding:7px 10px;border-radius:12px;color:var(--text-muted);box-shadow:0 3px 8px rgba(31,62,125,.08);font-size:var(--fs-small)}
     ._legend ._poor, ._legend ._excel{font-weight:700}
     ._legend ._poor{color:#d6455d}
     ._legend ._excel{margin-left:auto;font-weight:700;color:#228f76}
-    ._legend svg{flex:1;min-width:140px;height:12px}
+    ._legend svg{flex:1;min-width:110px;height:10px}
 
-    ._bars{display:flex;flex-direction:column;gap:12px;overflow:auto;padding-right:6px;margin-right:-6px;flex:1;min-height:0}
-    ._row{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,2.5fr) minmax(96px,1fr);gap:14px;align-items:center;padding:12px 14px;border-radius:16px;transition:transform .2s ease,box-shadow .2s ease;background:#f9faff;border:1px solid transparent}
+    ._bars{display:flex;flex-direction:column;gap:8px;overflow:hidden;flex:1;min-height:0}
+    ._row{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,2.1fr) minmax(78px,1fr);gap:10px;align-items:center;padding:8px 10px;border-radius:12px;transition:transform .2s ease,box-shadow .2s ease;background:#f9faff;border:1px solid transparent}
     ._row:hover{transform:translateY(-1px);box-shadow:0 8px 14px rgba(41,72,139,.12);border-color:var(--track-highlight)}
     ._avgRow{background:linear-gradient(135deg,#ecf3ff 0%,#f5faff 100%);border:1px solid var(--track-highlight)}
-    ._lab{font-weight:700;font-size:15px}
-    ._trk{height:12px;background:var(--track);border-radius:var(--radius-sm);position:relative;overflow:visible;border:1px solid var(--border)}
+    ._lab{font-weight:700;font-size:12px}
+    ._trk{height:9px;background:var(--track);border-radius:var(--radius-sm);position:relative;overflow:visible;border:1px solid var(--border)}
     ._fill{position:absolute;inset:0 auto 0 0;height:100%;border-radius:var(--radius-sm);width:0%;background:linear-gradient(90deg,var(--accent) 0%,var(--accent-strong) 90%);transition:width .25s cubic-bezier(.33,.02,.31,1)}
-    ._val{justify-self:end;background:#fff;border:1px solid var(--border);color:var(--accent-strong);padding:6px 12px;border-radius:999px;text-align:center;font-weight:800;min-width:96px;box-shadow:0 4px 12px rgba(45,61,120,.08);transition:background .3s ease,color .3s ease,border-color .3s ease}
+    ._val{justify-self:end;background:#fff;border:1px solid var(--border);color:var(--accent-strong);padding:4px 8px;border-radius:999px;text-align:center;font-weight:700;min-width:78px;box-shadow:0 3px 8px rgba(45,61,120,.08);transition:background .3s ease,color .3s ease,border-color .3s ease;font-size:11px}
     ._val[data-state="poor"]{color:#d6455d;border-color:rgba(214,69,93,.25);background:rgba(214,69,93,.08)}
     ._val[data-state="fair"]{color:#c28533;border-color:rgba(194,133,51,.25);background:rgba(194,133,51,.1)}
     ._val[data-state="good"]{color:#228f76;border-color:rgba(34,143,118,.26);background:rgba(34,143,118,.12)}
     ._val[data-state="numeric"]{color:var(--accent-strong)}
 
-    ._avgRow ._val{font-weight:900;background:var(--accent-strong);color:#fff;border:none;box-shadow:0 10px 20px rgba(36,78,155,.22)}
+    ._avgRow ._val{font-weight:800;background:var(--accent-strong);color:#fff;border:none;box-shadow:0 8px 16px rgba(36,78,155,.18);min-width:78px}
     ._avgRow ._trk{background:#dfe6fb}
 
-    ._rng{position:absolute;inset:-9px 0 -9px 0;width:100%;height:32px;background:transparent;cursor:pointer;appearance:none;-webkit-appearance:none;z-index:5}
+    ._rng{position:absolute;inset:-8px 0 -8px 0;width:100%;height:24px;background:transparent;cursor:pointer;appearance:none;-webkit-appearance:none;z-index:5}
     ._rng:focus{outline:none}
     ._rng::-webkit-slider-runnable-track{background:transparent}
     ._rng::-moz-range-track{background:transparent}
-    ._rng::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:#fff;border:3px solid var(--accent-strong);box-shadow:0 0 0 3px rgba(36,78,155,.18);position:relative;z-index:6;transition:transform .2s ease,box-shadow .2s ease}
-    ._rng::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:#fff;border:3px solid var(--accent-strong);box-shadow:0 0 0 3px rgba(36,78,155,.18);position:relative;z-index:6;transition:transform .2s ease,box-shadow .2s ease}
-    ._rng:focus::-webkit-slider-thumb,._rng:hover::-webkit-slider-thumb{transform:scale(1.15);box-shadow:0 0 0 5px rgba(52,84,209,.25)}
-    ._rng:focus::-moz-range-thumb,._rng:hover::-moz-range-thumb{transform:scale(1.15);box-shadow:0 0 0 5px rgba(52,84,209,.25)}
+    ._rng::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:12px;border-radius:50%;background:#fff;border:3px solid var(--accent-strong);box-shadow:0 0 0 2px rgba(36,78,155,.18);position:relative;z-index:6;transition:transform .2s ease,box-shadow .2s ease}
+    ._rng::-moz-range-thumb{width:12px;height:12px;border-radius:50%;background:#fff;border:3px solid var(--accent-strong);box-shadow:0 0 0 2px rgba(36,78,155,.18);position:relative;z-index:6;transition:transform .2s ease,box-shadow .2s ease}
+    ._rng:focus::-webkit-slider-thumb,._rng:hover::-webkit-slider-thumb{transform:scale(1.1);box-shadow:0 0 0 4px rgba(52,84,209,.2)}
+    ._rng:focus::-moz-range-thumb,._rng:hover::-moz-range-thumb{transform:scale(1.1);box-shadow:0 0 0 4px rgba(52,84,209,.2)}
 
-    @media (max-width:460px){
-      body{padding:12px 10px}
-      #_app{padding:18px 18px;gap:12px}
-      ._legend{margin-bottom:12px}
-      ._bars{padding-right:0;margin-right:0}
-      ._row{grid-template-columns:minmax(0,1fr) minmax(0,2fr);grid-template-areas:"label value" "track track";gap:10px;padding:10px 12px}
+    @media (max-width:420px){
+      body{padding:10px 8px}
+      #_app{padding:14px 16px;gap:10px}
+      ._legend{margin-bottom:10px}
+      ._row{grid-template-columns:minmax(0,1fr) minmax(0,2fr);grid-template-areas:"label value" "track track";gap:8px;padding:9px 11px}
       ._row ._lab{grid-area:label}
       ._row ._val{grid-area:value;justify-self:end}
       ._row ._trk{grid-area:track}
@@ -176,8 +177,7 @@ function avg(){
   const vals=rows.map(r=>parseFloat(r.querySelector("._rng").value||"0"));
   const pct=vals.reduce((a,b)=>a+b,0)/vals.length||0;
   avgFill.style.width=pct+"%";
-  const scaled=(pct/100*3).toFixed(2);
-  avgVal.textContent=`${scaled} (${Math.round(pct)}%)`;
+  avgVal.textContent=`${Math.round(pct)}%`;
 }
 
 rows.forEach(r=>{
